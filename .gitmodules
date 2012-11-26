@@ -1,3 +1,6 @@
 [submodule "queue"]
 	path = queue
 	url = git://github.com/lattera/queue.git
+[submodule "libsock"]
+	path = libsock
+	url = git://github.com/lattera/libsock.git

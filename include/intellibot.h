@@ -5,9 +5,10 @@
 #include <time.h>
 
 #include "queue.h"
+#include "sock.h"
 
 struct _intellibot;
-struct _sock;
+struct _server;
 struct _plugin;
 struct _plugin_ctx;
 struct _queue;
@@ -16,18 +17,11 @@ struct _queue;
 #define SOCK_FLAG_CONNECTED 1
 #define SOCK_FLAG_REGISTERED 2
 
-typedef struct _sock {
-    int sockfd;
-    void *buf;
-    size_t bufsz;
-    char *addr;
-    char *port;
-    unsigned int flags;
-    char *nick;
-    time_t last_ping;
+typedef struct _server {
+    SOCK *sock;
 
-    struct _sock *prev, *next;
-} SOCK;
+    struct _server *prev, *next;
+};
 
 typedef struct _plugin_ctx {
     struct _plugin *plugin;
