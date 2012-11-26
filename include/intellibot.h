@@ -29,11 +29,20 @@ typedef struct _plugin_ctx {
     void *ctx;
 } PLUGIN_CTX;
 
+#define SUBSCRIPTION_JOIN       0x00000001
+#define SUBSCRIPTION_PART       0x00000002
+#define SUBSCRIPTION_CONNECT    0x00000004
+#define SUBSCRIPTION_DISCONNECT 0x00000008
+#define SUBSCRIPTION_PRIVMSG    0x00000010
+
 typedef struct _plugin {
+    pthread_t tid;
     void *handle;
     void *ctx;
+    unsigned int subscriptions;
 
     QUEUE *queue;
+    int (*run)(struct _plugin *, char *);
 
     struct _plugin *prev, *next;
 } PLUGIN;
