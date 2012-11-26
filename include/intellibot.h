@@ -21,7 +21,7 @@ typedef struct _server {
     SOCK *sock;
 
     struct _server *prev, *next;
-};
+} SERVER;
 
 typedef struct _plugin_ctx {
     struct _plugin *plugin;
@@ -40,7 +40,7 @@ typedef struct _plugin {
 
 typedef struct _intellibot {
     PLUGIN *plugins;
-    SOCK *servers;
+    SERVER *servers;
 } INTELLIBOT;
 
 #endif
