@@ -1,11 +1,18 @@
 #if !defined(_INTELLIBOT_H)
 #define _INTELLIBOT_H
 
+#include <sys/types.h>
+#include <time.h>
+
 struct _intellibot;
 struct _sock;
 struct _plugin;
 struct _plugin_ctx;
 struct _queue;
+
+#define SOCK_FLAG_DISCONNECTED 0
+#define SOCK_FLAG_CONNECTED 1
+#define SOCK_FLAG_REGISTERED 2
 
 typedef struct _sock {
     int sockfd;
@@ -15,6 +22,9 @@ typedef struct _sock {
     char *port;
     unsigned int flags;
     char *nick;
+    time_t last_ping;
+
+    struct _sock *prev, *next;
 } SOCK;
 
 typedef struct _plugin_ctx {
@@ -44,7 +54,7 @@ typedef struct _plugin {
 
 typedef struct _intellibot {
     PLUGIN *plugins;
-
+    SOCK *servers;
 } INTELLIBOT;
 
 #endif
