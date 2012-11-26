@@ -5,17 +5,17 @@
 
 #include "intellibot.h"
 
-int main(int argc, char *argv[])
+INTELLIBOT *init_bot(void)
 {
     INTELLIBOT *bot;
 
     bot = calloc(1, sizeof(INTELLIBOT));
-    if (!(bot)) {
-        fprintf(stderr, "[-] Unable to allocate bot's memory\n");
-        return 1;
-    }
+    if (!(bot))
+        return NULL;
 
-    free(bot);
+    return bot;
+}
 
-    return 0;
+void fini_bot(INTELLIBOT *bot)
+{
 }

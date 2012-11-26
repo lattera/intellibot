@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <time.h>
 
+#include "queue.h"
+
 struct _intellibot;
 struct _sock;
 struct _plugin;
@@ -33,21 +35,11 @@ typedef struct _plugin_ctx {
     void *ctx;
 } PLUGIN_CTX;
 
-typedef int (*connect_cb)(PLUGIN_CTX *);
-typedef int (*disconnect_cb)(PLUGIN_CTX *);
-typedef int (*join_cb)(PLUGIN_CTX *, const char *, const char *, const char *); /* ctx, chan, nick, nickmask */
-typedef int (*part_cb)(PLUGIN_CTX *, const char *, const char *); /* ctx, chan, nick */
-typedef int (*privmsg_cb)(PLUGIN_CTX *, const char *, const char *, const char *); /* ctx, chan, nick, msg */
-
 typedef struct _plugin {
     void *handle;
     void *ctx;
 
-    connect_cb connect;
-    disconnect_cb disconnect;
-    join_cb join;
-    part_cb part;
-    privmsg_cb privmsg;
+    QUEUE *queue;
 
     struct _plugin *prev, *next;
 } PLUGIN;
