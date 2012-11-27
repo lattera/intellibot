@@ -84,4 +84,8 @@ void Free_Rows(ROW *);
 ROW *DB_Query(INTELLIBOT *, const char *, int);
 void DB_Execute(INTELLIBOT *, const char *);
 
+/* bot.c */
+INTELLIBOT *Initialize_Bot(const char *);
+void Deinitialize_Bot(INTELLIBOT *);
+
 #endif

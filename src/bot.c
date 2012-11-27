@@ -5,7 +5,7 @@
 
 #include "intellibot.h"
 
-INTELLIBOT *init_bot(void)
+INTELLIBOT *Initialize_Bot(const char *dbpath)
 {
     INTELLIBOT *bot;
 
@@ -13,9 +13,16 @@ INTELLIBOT *init_bot(void)
     if (!(bot))
         return NULL;
 
+    bot->db = Initialize_DB(dbpath);
+    if (!(bot->db)) {
+        free(bot);
+        return NULL;
+    }
+
     return bot;
 }
 
-void fini_bot(INTELLIBOT *bot)
+void Deinitialize_Bot(INTELLIBOT *bot)
 {
+    Deinitialize_DB(bot);
 }
