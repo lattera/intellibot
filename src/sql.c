@@ -154,5 +154,7 @@ ROW *DB_Query(INTELLIBOT *bot, const char *query, int needs_lock)
 
 void DB_Execute(INTELLIBOT *bot, const char *query)
 {
-    Free_Rows(DB_Query(bot, query, 1));
+    ROW *rows;
+    if ((rows = DB_Query(bot, query, 1)))
+        Free_Rows(rows);
 }

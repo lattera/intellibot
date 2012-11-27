@@ -15,12 +15,22 @@ struct _plugin;
 struct _plugin_ctx;
 struct _queue;
 
-#define SOCK_FLAG_DISCONNECTED 0
-#define SOCK_FLAG_CONNECTED 1
-#define SOCK_FLAG_REGISTERED 2
+#define SERVER_FLAG_DISCONNECTED  0x00000000
+#define SERVER_FLAG_CONNECTED     0x00000001
+#define SERVER_FLAG_REGISTERED    0x00000002
+
+typedef struct _user {
+    char nick[51];
+    char password[51];
+    char **roles;
+    unsigned long nroles;
+    unsigned int flags;
+} USER;
 
 typedef struct _server {
     SOCK *sock;
+    unsigned int flags;
+    time_t last_ping;
 
     struct _server *prev, *next;
 } SERVER;
@@ -28,6 +38,8 @@ typedef struct _server {
 typedef struct _plugin_ctx {
     struct _plugin *plugin;
     struct _intellibot *bot;
+    struct _server *server;
+    char *action;
     void *ctx;
 } PLUGIN_CTX;
 
@@ -36,6 +48,9 @@ typedef struct _plugin_ctx {
 #define SUBSCRIPTION_CONNECT    0x00000004
 #define SUBSCRIPTION_DISCONNECT 0x00000008
 #define SUBSCRIPTION_PRIVMSG    0x00000010
+
+#define SUBSCRIBE(o, s) do { o->subscriptions |= SUBSCRIPTION_##s; } while(0);
+#define SUBSCRIBED(o, s) ((o->subscriptions & SUBSCRIPTION_##s) == SUBSCRIPTION_##s)
 
 typedef struct _plugin {
     pthread_t tid;
@@ -79,6 +94,7 @@ typedef struct _intellibot {
 /* sql.c */
 SQL_CTX *Initialize_DB(const char *);
 void Deinitialize_DB(INTELLIBOT *);
+char *Get_Column(ROW *, char *);
 void Free_Column(COLUMN *);
 void Free_Rows(ROW *);
 ROW *DB_Query(INTELLIBOT *, const char *, int);
@@ -87,5 +103,8 @@ void DB_Execute(INTELLIBOT *, const char *);
 /* bot.c */
 INTELLIBOT *Initialize_Bot(const char *);
 void Deinitialize_Bot(INTELLIBOT *);
+
+/* irc.c */
+void Server_Loop(INTELLIBOT *);
 
 #endif

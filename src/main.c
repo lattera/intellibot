@@ -26,18 +26,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    rows = DB_Query(bot, "SELECT * FROM config", 0);
-    if (!(rows)) {
-        fprintf(stderr, "[-] Query failed\n");
-    }
-
-    for (row = rows; row != NULL; row = row->next) {
-        for (column = row->columns; column != NULL; column = column->next) {
-            fprintf(stderr, "config[%s]: %s\n", column->name, column->data);
-        }
-    }
-
-    Free_Rows(rows);
+    Server_Loop(bot);
 
     Deinitialize_Bot(bot);
 
