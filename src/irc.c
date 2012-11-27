@@ -67,6 +67,24 @@ void Server_Loop(INTELLIBOT *bot)
     }
 }
 
+void Free_Data(DATA *data)
+{
+    if (data->from)
+        free(data->from);
+    if (data->chan)
+        free(data->chan);
+    if (data->action)
+        free(data->action);
+    if (data->data)
+        free(data->data);
+    if (data->hostmask)
+        free(data->hostmask);
+    if (data->replyTo)
+        free(data->replyTo);
+
+    free(data);
+}
+
 DATA *parse_data(INTELLIBOT *bot, char *buf)
 {
     DATA *data;
@@ -88,12 +106,19 @@ DATA *parse_data(INTELLIBOT *bot, char *buf)
     data->hostmask = strdup(buf+1);
     data->action = strdup(p1);
 
+    p1 = strchr(data->hostmask, '!');
+    data->from = malloc((size_t)(p1 - data->hostmask)+1);
+    if (!(data->from)) {
+        Free_data(data);
+        return NULL;
+    }
+    memcpy(data->from, data->hostmask, (size_t)(p1 - data->hostmask));
+    data->from[(size_t)(p1 - data->hostmask)] = 0x00;
+
     if (!strcmp(data->action, "PRIVMSG")) {
         p1 = strchr(++p2, ' ');
         if (!(p1)) {
-            free(data->hostmask);
-            free(data->action);
-            free(data);
+            Free_Data(data);
             return NULL;
         }
 
@@ -104,13 +129,22 @@ DATA *parse_data(INTELLIBOT *bot, char *buf)
         if (data->chan[0] == '#') {
             data->replyTo = strdup(data->chan);
         } else {
-            p1 = strchr(data->hostmask, '!');
-            data->replyTo = malloc((size_t)(p1 - data->hostmask) + 1);
-            memcpy(data->replyTo, data->hostmask, (size_t)(p1 - data->hostmask));
-            data->replyTo[(size_t)(p1 - data->hostmask)] = 0x00;
-
+            data->replyTo = strdup(data->from);
         }
-        fprintf(stderr, "reply to: %s\n", data->replyTo);
+
+        return data;
+    }
+
+    data->replyTo = strdup(data->from);
+
+    if (!strcmp(data->action, "JOIN")) {
+        data->chan = strdup(p2+2);
+
+        fprintf(stderr, "[*] %s joined %s\n", data->from, data->chan);
+    }
+
+    if (!strcmp(data->action, "PART")) {
+        data->chan = strdup(p2+2);
     }
 
     return data;
