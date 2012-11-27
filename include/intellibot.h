@@ -1,6 +1,7 @@
 #if !defined(_INTELLIBOT_H)
 #define _INTELLIBOT_H
 
+#include <stdarg.h>
 #include <sys/types.h>
 #include <time.h>
 
@@ -123,5 +124,7 @@ void Deinitialize_Bot(INTELLIBOT *);
 
 /* irc.c */
 void Server_Loop(INTELLIBOT *);
+ssize_t PrivMsg(SERVER *, char *, char *, ...);
+void Join(SERVER *, char *);
 
 #endif

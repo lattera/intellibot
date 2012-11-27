@@ -13,7 +13,7 @@ DATA *parse_data(INTELLIBOT *, char *);
 void Server_Loop(INTELLIBOT *bot)
 {
     SERVER *server;
-    int maxfd, i;
+    int maxfd, i, j=0;
     fd_set readfds;
     struct timeval tv;
     ssize_t retval;
@@ -42,8 +42,12 @@ void Server_Loop(INTELLIBOT *bot)
 
         if (maxfd == 0) {
             /* Perform ping */
-            for (server = bot->servers; server != NULL; server = server->next)
-                SocketWrite(server->sock, "JOIN #test\n", strlen("JOIN #test\n"));
+            for (server = bot->servers; server != NULL; server = server->next) {
+                if (!((j++) % 2))
+                    Join(server, "#test");
+                else
+                    PrivMsg(server, "#test", "Never fear, %s is here!\n", server->nick);
+            }
             continue;
         }
 
@@ -109,7 +113,7 @@ DATA *parse_data(INTELLIBOT *bot, char *buf)
     p1 = strchr(data->hostmask, '!');
     data->from = malloc((size_t)(p1 - data->hostmask)+1);
     if (!(data->from)) {
-        Free_data(data);
+        Free_Data(data);
         return NULL;
     }
     memcpy(data->from, data->hostmask, (size_t)(p1 - data->hostmask));
@@ -148,4 +152,24 @@ DATA *parse_data(INTELLIBOT *bot, char *buf)
     }
 
     return data;
+}
+
+ssize_t PrivMsg(SERVER *server, char *to, char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+
+    snprintf(server->buf, server->bufsz, "PRIVMSG %s :", to);
+    vsnprintf(server->buf+strlen(server->buf), server->bufsz-strlen(server->buf), fmt, ap);
+
+    va_end(ap);
+
+    return SocketWrite(server->sock, server->buf, strlen(server->buf));
+}
+
+void Join(SERVER *server, char *chan)
+{
+    snprintf(server->buf, server->bufsz, "JOIN %s\n", chan);
+    SocketWrite(server->sock, server->buf, strlen(server->buf));
 }
