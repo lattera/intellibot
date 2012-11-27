@@ -15,10 +15,6 @@ struct _plugin;
 struct _plugin_ctx;
 struct _queue;
 
-#define SERVER_FLAG_DISCONNECTED  0x00000000
-#define SERVER_FLAG_CONNECTED     0x00000001
-#define SERVER_FLAG_REGISTERED    0x00000002
-
 typedef struct _user {
     char nick[51];
     char password[51];
@@ -27,10 +23,22 @@ typedef struct _user {
     unsigned int flags;
 } USER;
 
+#define SERVER_FLAG_DISCONNECTED  0x00000000
+#define SERVER_FLAG_CONNECTED     0x00000001
+#define SERVER_FLAG_REGISTERED    0x00000002
+
+#define BUFSZ 1024
+
 typedef struct _server {
     SOCK *sock;
+    char *host;
+    char *port;
+    char *nick;
     unsigned int flags;
     time_t last_ping;
+
+    char *buf;
+    size_t bufsz;
 
     struct _server *prev, *next;
 } SERVER;
@@ -90,6 +98,15 @@ typedef struct _intellibot {
     
     SQL_CTX *db;
 } INTELLIBOT;
+
+typedef struct _data {
+    char *action;
+    char *data;
+    char *from;
+    char *hostmask;
+    char *replyTo;
+    char *chan;
+} DATA;
 
 /* sql.c */
 SQL_CTX *Initialize_DB(const char *);

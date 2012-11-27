@@ -31,6 +31,8 @@ INTELLIBOT *Initialize_Bot(const char *dbpath)
         Add_Server(bot, row);
     }
 
+    Free_Rows(rows);
+
     return bot;
 }
 
@@ -60,6 +62,23 @@ void Add_Server(INTELLIBOT *bot, ROW *row)
             return;
     }
 
+    server->buf = calloc(1, BUFSZ+1);
+    if (!(server->buf)) {
+        if ((server->prev))
+            server->prev->next = NULL;
+
+        if (server == bot->servers)
+            bot->servers = NULL;
+
+        free(server);
+        return;
+    }
+    server->bufsz = BUFSZ;
+
+    server->host = strdup(Get_Column(row, "host"));
+    server->port = strdup(Get_Column(row, "port"));
+    server->nick = strdup(Get_Column(row, "nick"));
+
     server->sock = SocketClient(Get_Column(row, "host"), Get_Column(row, "port"), SOCK_TCP);
     if (!(server->sock)) {
         if ((server->prev))
@@ -72,6 +91,11 @@ void Add_Server(INTELLIBOT *bot, ROW *row)
 
         return;
     }
+
+    snprintf(server->buf, server->bufsz, "USER %s %s %s :%s\n", server->nick, server->nick, server->host, server->nick);
+    SocketWrite(server->sock, server->buf, strlen(server->buf));
+    snprintf(server->buf, server->bufsz, "NICK %s\n", server->nick);
+    SocketWrite(server->sock, server->buf, strlen(server->buf));
 
     server->last_ping = time(NULL);
     server->flags |= SERVER_FLAG_CONNECTED;
