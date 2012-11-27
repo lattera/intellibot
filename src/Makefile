@@ -1,10 +1,10 @@
 TARGET=intellibot
-CFLAGS=-g -I../include -I../queue/include -I../libsock/include
-LDFLAGS=
+CFLAGS=-g -I../include -I../queue/include -I../libsock/include -I/usr/local/include
+LDFLAGS=-lsqlite3 -L/usr/local/lib
 CC=clang
 
-SRCS=main.c bot.c ../libsock/src/libsock.c ../libsock/src/util.c ../queue/src/queue.c
-OBJS=main.o bot.o queue.o util.o libsock.o
+SRCS=main.c bot.c sql.c ../libsock/src/libsock.c ../libsock/src/util.c ../queue/src/queue.c
+OBJS=main.o bot.o sql.o queue.o util.o libsock.o
 
 ${TARGET}: ${OBJS}
 	${CC} -o ${TARGET} ${LDFLAGS} ${OBJS}

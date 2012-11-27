@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <time.h>
 
+#include <sqlite3.h>
+
 #include "queue.h"
 #include "sock.h"
 
@@ -47,9 +49,39 @@ typedef struct _plugin {
     struct _plugin *prev, *next;
 } PLUGIN;
 
+typedef struct _column {
+    char *name;
+    char *data;
+
+    struct _column *prev, *next;
+} COLUMN;
+
+typedef struct _row {
+    COLUMN *columns;
+
+    struct _row *prev, *next;
+} ROW;
+
+typedef struct _sql_ctx {
+    char *path;
+    pthread_mutex_t execute_mutex;
+
+    sqlite3 *db;
+} SQL_CTX;
+
 typedef struct _intellibot {
     PLUGIN *plugins;
     SERVER *servers;
+    
+    SQL_CTX *db;
 } INTELLIBOT;
+
+/* sql.c */
+SQL_CTX *Initialize_DB(const char *);
+void Deinitialize_DB(INTELLIBOT *);
+void Free_Column(COLUMN *);
+void Free_Rows(ROW *);
+ROW *DB_Query(INTELLIBOT *, const char *, int);
+void DB_Execute(INTELLIBOT *, const char *);
 
 #endif
